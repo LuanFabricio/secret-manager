@@ -13,12 +13,12 @@ import (
 var db *sql.DB = database.GetConnection();
 
 func CreateUser(c *gin.Context) {
-	var user_data user.User;
+	var user_data user.UserDTO;
 
 	err := c.ShouldBindJSON(&user_data);
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H {
-			"message": err,
+			"message": err.Error(),
 		});
 		return;
 	}
@@ -40,23 +40,23 @@ func CreateUser(c *gin.Context) {
 	new_user, err := user.Create(db, user_data.Username, user_data.Password);
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H {
-			"message": err,
+			"message": err.Error(),
 		});
 		return;
 	}
 
 	c.IndentedJSON(http.StatusCreated, gin.H {
 		"id": new_user.ID,
-		"new_username": new_user.Username,
+		"username": new_user.Username,
 	});
 }
 
 func GetUserById(c *gin.Context) {
-	var user_data user.User;
+	var user_data user.UserDTO;
 
 	if err := c.ShouldBindJSON(&user_data); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H {
-			"message": err,
+			"message": err.Error(),
 		});
 		return;
 	}
@@ -70,8 +70,8 @@ func GetUserById(c *gin.Context) {
 
 	find_user, err := user.FindByID(db, *user_data.ID);
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H {
-			"message": err,
+		c.IndentedJSON(http.StatusNotFound, gin.H {
+			"message": err.Error(),
 		});
 		return;
 	}
