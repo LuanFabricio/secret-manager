@@ -3,7 +3,10 @@ package user
 import (
 	"crypto/sha256"
 	"database/sql"
+	"errors"
 	"fmt"
+	"os"
+	"time"
 )
 
 type UserDTO struct {
@@ -16,19 +19,33 @@ type UserDB struct {
 	ID *uint `json:"id"`
 	Username string `json:"username"`
 	Hash string `json:"hash"`
+	CreatedAt time.Time `json:"created_at"`
+	Active bool `json:"active"`
 }
 
 func Create(db* sql.DB, username string, password string) (*UserDB, error) {
-	hash := sha256.Sum256([]byte(password));
+	salt, found := os.LookupEnv("SALT");
+	if !found {
+
+		return nil, errors.New("Salt secret not found");
+	}
+
+	salted_password := salt + password;
+	hash := sha256.Sum256([]byte(salted_password));
 	hash_string := fmt.Sprintf("%x", hash);
 
 	var db_user UserDB;
 	var err = db.QueryRow(
 		`INSERT INTO users (username, hash)
 		VALUES ($1, $2)
-		RETURNING id, username, hash`,
+		RETURNING id, username, hash, created_at, active`,
 		username, hash_string,
-	).Scan(&db_user.ID, &db_user.Username, &db_user.Hash);
+	).Scan(&db_user.ID,
+		&db_user.Username,
+		&db_user.Hash,
+		&db_user.CreatedAt,
+		&db_user.Active,
+	);
 
 	if err != nil {
 		return nil, err;
@@ -40,12 +57,23 @@ func Create(db* sql.DB, username string, password string) (*UserDB, error) {
 func FindByID(db *sql.DB, id uint) (*UserDB, error) {
 	var find_user UserDB;
 	row := db.QueryRow(
-		`SELECT	id, username, hash FROM users
+		`SELECT	id,
+			username,
+			hash,
+			created_at,
+			active
+		FROM users
 		WHERE id = $1`,
 		id,
 	);
 
-	err := row.Scan(&find_user.ID, &find_user.Username, &find_user.Hash);
+	err := row.Scan(
+		&find_user.ID,
+		&find_user.Username,
+		&find_user.Hash,
+		&find_user.CreatedAt,
+		&find_user.Active,
+	);
 
 	if err != nil {
 		return nil, err;
