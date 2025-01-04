@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserDTO struct {
@@ -21,6 +23,15 @@ type UserDB struct {
 	Hash string `json:"hash"`
 	CreatedAt time.Time `json:"created_at"`
 	Active bool `json:"active"`
+}
+
+func (ud *UserDB) ToH() gin.H {
+	return gin.H{
+		"id": ud.ID,
+		"username": ud.Username,
+		"created_at": ud.CreatedAt,
+		"active": ud.Active,
+	};
 }
 
 func Create(db* sql.DB, username string, password string) (*UserDB, error) {

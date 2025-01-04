@@ -76,8 +76,5 @@ func GetUserById(c *gin.Context) {
 		return;
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H {
-		"id": find_user.ID,
-		"username": find_user.Username,
-	});
+	c.IndentedJSON(http.StatusOK, find_user.ToH());
 }
