@@ -2,13 +2,14 @@ package user
 
 import (
 	"crypto/sha256"
-	"database/sql"
 	"errors"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+	"secret-manager/backend/services/database"
 )
 
 type UserDTO struct {
@@ -34,7 +35,7 @@ func (ud *UserDB) ToH() gin.H {
 	};
 }
 
-func Create(db* sql.DB, username string, password string) (*UserDB, error) {
+func Create(db database.Database, username string, password string) (*UserDB, error) {
 	salt, found := os.LookupEnv("SALT");
 	if !found {
 
@@ -65,7 +66,7 @@ func Create(db* sql.DB, username string, password string) (*UserDB, error) {
 	return &db_user, nil;
 }
 
-func FindByID(db *sql.DB, id uint) (*UserDB, error) {
+func FindByID(db database.Database, id uint) (*UserDB, error) {
 	var find_user UserDB;
 	row := db.QueryRow(
 		`SELECT	id,

@@ -1,7 +1,6 @@
 package user
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +9,7 @@ import (
 	"secret-manager/backend/services/database"
 )
 
-var db *sql.DB = database.GetConnection();
+var db database.Database = database.GetConnection();
 
 func CreateUser(c *gin.Context) {
 	var user_data user.UserDTO;

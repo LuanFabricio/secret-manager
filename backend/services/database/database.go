@@ -8,8 +8,16 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB = nil;
-func GetConnection() *sql.DB {
+type Row interface {
+	Scan(dest ...any) error;
+}
+
+type Database interface {
+	QueryRow(query string, args ...any) *sql.Row;
+}
+
+var db Database = nil;
+func GetConnection() Database {
 	if db == nil {
 		db = bootConnection()
 	}
