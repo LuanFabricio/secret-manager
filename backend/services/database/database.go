@@ -16,6 +16,7 @@ type Database interface {
 	QueryRow(query string, args ...any) *sql.Row;
 }
 
+// NOTE: Maybe move back to *sql.DB
 var db Database = nil;
 func GetConnection() Database {
 	if db == nil {
