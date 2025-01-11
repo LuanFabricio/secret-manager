@@ -14,6 +14,8 @@ type Row interface {
 
 type Database interface {
 	QueryRow(query string, args ...any) *sql.Row;
+	Query(query string, args ...any) (*sql.Rows, error);
+	Begin() (*sql.Tx, error);
 }
 
 // NOTE: Maybe move back to *sql.DB
@@ -26,9 +28,10 @@ func GetConnection() Database {
 }
 
 func bootConnection() *sql.DB {
-	PSQL_CONNECTION_ENV := "PSQL_CONNECTION"
+	PSQL_CONNECTION_ENV := "SM_PSQL_CONNECTION"
 	psql_connection, found := os.LookupEnv(PSQL_CONNECTION_ENV);
 
+	log.Printf("PSQL Connection(connected? %v): %v\n", found, psql_connection)
 	if !found {
 		log.Fatalf("Could not find \"%v\"\n", PSQL_CONNECTION_ENV);
 	}

@@ -36,7 +36,7 @@ func (ud *UserDB) ToH() gin.H {
 }
 
 func Create(db database.Database, username string, password string) (*UserDB, error) {
-	salt, found := os.LookupEnv("SALT");
+	salt, found := os.LookupEnv("SM_SALT");
 	if !found {
 
 		return nil, errors.New("Salt secret not found");
