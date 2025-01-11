@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -51,23 +52,29 @@ func CreateUser(c *gin.Context) {
 }
 
 func GetUserById(c *gin.Context) {
-	var user_data user.UserDTO;
-
-	if err := c.ShouldBindJSON(&user_data); err != nil {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H {
 			"message": err.Error(),
 		});
 		return;
 	}
 
-	if user_data.ID == nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H {
-			"message": "Error: ID not provided",
+	find_user, err := user.FindByID(db, uint(id));
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H {
+			"message": err.Error(),
 		});
 		return;
 	}
 
-	find_user, err := user.FindByID(db, *user_data.ID);
+	c.IndentedJSON(http.StatusOK, find_user.ToH());
+}
+
+func GetUserByUsername(c *gin.Context) {
+	username := c.Param("username")
+
+	find_user, err := user.FindByUsername(db, username);
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H {
 			"message": err.Error(),
