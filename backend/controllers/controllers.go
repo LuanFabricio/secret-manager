@@ -7,6 +7,7 @@ import (
 )
 
 func BindRoutes(r *gin.Engine) {
-	r.GET("/user", user.GetUserById);
+	r.GET("/user/id/:id", user.GetUserById);
+	r.GET("/user/username/:username", user.GetUserByUsername);
 	r.POST("/user", user.CreateUser);
 }
