@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -28,6 +29,7 @@ func GetConnection() Database {
 }
 
 func bootConnection() *sql.DB {
+	godotenv.Load()
 	PSQL_CONNECTION_ENV := "SM_PSQL_CONNECTION"
 	psql_connection, found := os.LookupEnv(PSQL_CONNECTION_ENV);
 
