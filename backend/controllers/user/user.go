@@ -9,7 +9,7 @@ import (
 	"secret-manager/backend/services/database"
 )
 
-var db database.Database = database.GetConnection();
+var db database.Database = database.GetConnection()
 
 func CreateUser(c *gin.Context) {
 	var user_data user.UserDTO;
