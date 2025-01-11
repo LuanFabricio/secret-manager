@@ -1,7 +1,6 @@
 package user
 
 import (
-	"log"
 	"os"
 	"testing"
 	"time"
