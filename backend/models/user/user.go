@@ -93,3 +93,31 @@ func FindByID(db database.Database, id uint) (*UserDB, error) {
 
 	return &find_user, nil;
 }
+
+func FindByUsername(db database.Database, username string) (*UserDB, error) {
+	var find_user UserDB;
+	row := db.QueryRow(
+		`SELECT	id,
+			username,
+			hash,
+			created_at,
+			active
+		FROM users
+		WHERE username = $1`,
+		username,
+	);
+
+	err := row.Scan(
+		&find_user.ID,
+		&find_user.Username,
+		&find_user.Hash,
+		&find_user.CreatedAt,
+		&find_user.Active,
+	);
+
+	if err != nil {
+		return nil, err;
+	}
+
+	return &find_user, nil;
+}
