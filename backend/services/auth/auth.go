@@ -43,7 +43,7 @@ func ExtractTokenId(userToken string) (string, error) {
 		return "", errors.New("Failed to claim the parsed token")
 	}
 
-	return fmt.Sprintf("%s", claims["id"]), nil
+	return fmt.Sprintf("%v", claims["id"]), nil
 }
 
 func parseToken(userToken string) (*jwt.Token, error) {
