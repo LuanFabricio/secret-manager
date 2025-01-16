@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"secret-manager/backend/services/database"
+
+	"github.com/gin-gonic/gin"
 )
 
 
@@ -23,6 +25,18 @@ type SecretDB struct {
 	Secret    string `json:"secret"`
 	Encrypted bool `json:"encrypted"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+func (sd *SecretDB) ToH() gin.H {
+	return gin.H{
+		"id": sd.ID,
+		"user_id": sd.UserID,
+		"name": sd.Name,
+		"secret": sd.Secret,
+		"encrypted": sd.Encrypted,
+		"created_at": sd.CreatedAt,
+
+	};
 }
 
 func Create(db database.Database, secret SecretDTO) (*SecretDB, error) {
