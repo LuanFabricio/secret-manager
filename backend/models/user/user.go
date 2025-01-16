@@ -26,6 +26,30 @@ type UserDB struct {
 	Active bool `json:"active"`
 }
 
+func ValidateCredentials(db database.Database, user_header UserDTO) (*uint, bool) {
+	hash_string, err := hashPassword(user_header.Username, user_header.Password)
+
+	if err != nil {
+		return nil, false
+	}
+
+	var id uint
+	err = db.QueryRow(
+		`SELECT
+			usr.id
+		FROM users usr
+		WHERE trim(usr.username) = $1
+			and trim(usr.hash) = $2`,
+		user_header.Username, hash_string,
+	).Scan(&id)
+
+	if err != nil {
+		return nil, false
+	}
+
+	return &id, true
+}
+
 func (ud *UserDB) ToH() gin.H {
 	return gin.H{
 		"id": ud.ID,
@@ -36,18 +60,13 @@ func (ud *UserDB) ToH() gin.H {
 }
 
 func Create(db database.Database, username string, password string) (*UserDB, error) {
-	salt, found := os.LookupEnv("SM_SALT");
-	if !found {
-
-		return nil, errors.New("Salt secret not found");
+	hash_string, err := hashPassword(username, password)
+	if err != nil {
+		return nil, err
 	}
 
-	salted_password := salt + password;
-	hash := sha256.Sum256([]byte(salted_password));
-	hash_string := fmt.Sprintf("%x", hash);
-
 	var db_user UserDB;
-	var err = db.QueryRow(
+	err = db.QueryRow(
 		`INSERT INTO users (username, hash)
 		VALUES ($1, $2)
 		RETURNING id, username, hash, created_at, active`,
@@ -120,4 +139,17 @@ func FindByUsername(db database.Database, username string) (*UserDB, error) {
 	}
 
 	return &find_user, nil;
+}
+
+func hashPassword(username string, password string) (string, error) {
+	salt, found := os.LookupEnv("SM_SALT");
+	if !found {
+		return "", errors.New("Salt secret not found");
+	}
+
+	salted_password := username + salt + password;
+	hash := sha256.Sum256([]byte(salted_password));
+	hash_string := fmt.Sprintf("%x", hash);
+
+	return hash_string, nil
 }
