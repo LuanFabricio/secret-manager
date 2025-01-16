@@ -16,11 +16,6 @@ func main() {
 	godotenv.Load();
 
 	r := gin.Default();
-	r.GET("/ping", func (ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "pong",
-		});
-	})
 
 	controllers.BindRoutes(r);
 

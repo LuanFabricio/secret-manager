@@ -12,7 +12,7 @@ import (
 )
 
 func setupTest(t *testing.T) {
-	godotenv.Load()
+	godotenv.Load("../.env")
 	db := database.GetConnection()
 
 	query_bytes, err :=  os.ReadFile("../sql/01_user/01_create_user_table.sql");
