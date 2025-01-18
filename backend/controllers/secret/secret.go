@@ -37,5 +37,11 @@ func CreateSecret(c *gin.Context) {
 	}
 
 	secret_db, err := secret.Create(db, secret_data)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
 	c.IndentedJSON(http.StatusCreated, secret_db.ToH())
 }

@@ -39,8 +39,10 @@ func (sd *SecretDB) ToH() gin.H {
 	};
 }
 
+// TODO: Add a secret encryption (sync)
 func Create(db database.Database, secret SecretDTO) (*SecretDB, error) {
 	var new_secret SecretDB;
+
 	err := db.QueryRow(
 		`INSERT INTO secrets (user_id, name, secret, encrypted)
 		VALUES ($1, $2, $3, $4)
