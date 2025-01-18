@@ -12,10 +12,11 @@ import (
 
 type SecretDTO struct {
 	ID        *uint `json:"id"`
-	UserID	  uint  `json:"user_id"`
-	Name      string `json:"name"`
-	Secret    string `json:"secret"`
-	Encrypted bool `json:"encrypted"`
+	UserID	  uint  `json:"user_id" binding:"required"`
+	Name      string `json:"name" binding:"required"`
+	Secret    string `json:"secret" binding:"required"`
+	Encrypted bool `json:"encrypted" binding:"required"`
+	EncryptionKey string `json:"encryption_key"`
 	CreatedAt *time.Time `json:"created_at"`
 }
 
