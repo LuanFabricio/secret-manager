@@ -1,6 +1,7 @@
 package secret
 
 import (
+	"errors"
 	"time"
 
 	"secret-manager/backend/services/database"
@@ -39,9 +40,14 @@ func (sd *SecretDB) ToH() gin.H {
 	};
 }
 
-// TODO: Add a secret encryption (sync)
+// TODO: Add a secret encryption (sync) support
 func Create(db database.Database, secret SecretDTO) (*SecretDB, error) {
 	var new_secret SecretDB;
+
+	if secret.Encrypted /*&& secret.EncryptionKey == ""*/{
+		return nil, errors.New("Secret encryption dont have support, yet")
+		// return nil, errors.New("The encryption key should be passed")
+	}
 
 	err := db.QueryRow(
 		`INSERT INTO secrets (user_id, name, secret, encrypted)
