@@ -15,6 +15,7 @@ import (
 func main() {
 	godotenv.Load();
 
+	// NOTE: Maybe move to New() and add the log middleware
 	r := gin.Default();
 
 	controllers.BindRoutes(r);
