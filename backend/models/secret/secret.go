@@ -69,3 +69,32 @@ func Create(db database.Database, secret SecretDTO) (*SecretDB, error) {
 
 	return &new_secret, nil
 }
+
+func FindByID(db database.Database, secret_id uint) (*SecretDB, error) {
+	var find_secret SecretDB
+
+	err := db.QueryRow(
+		`SELECT
+			s.id,
+			s.user_id,
+			s.name,
+			s.secret,
+			s.encrypted,
+			s.created_at
+		FROM secrets s
+		WHERE s.id = $1`,
+		secret_id,
+	).Scan(&find_secret.ID,
+		&find_secret.UserID,
+		&find_secret.Name,
+		&find_secret.Secret,
+		&find_secret.Encrypted,
+		&find_secret.CreatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &find_secret, nil
+}
