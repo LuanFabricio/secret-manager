@@ -109,3 +109,32 @@ func TestFindSecretByID(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestFindSecretByUserID(t *testing.T) {
+	setupTestSecret(t)
+
+	db := database.GetConnection()
+	user_db, err := user_model.Create(db, "secret_user_test", "somepass")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user_id := *user_db.ID
+	secret_dto := secret_model.SecretDTO{
+		UserID: user_id,
+		Name: "some secret name",
+		Secret: "some secret",
+		Encrypted: false,
+	}
+
+	secrets_len := 10
+	for i := 0; i < secrets_len; i++ {
+		secret_model.Create(db, secret_dto)
+	}
+
+	secrets, err := secret_model.FindByUserID(db, user_id)
+
+	if len(secrets) != secrets_len {
+		t.Fatalf("The secrets length dont match")
+	}
+}
