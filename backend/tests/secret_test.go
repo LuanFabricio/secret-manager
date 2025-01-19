@@ -78,3 +78,34 @@ func TestCreateSecret(t *testing.T) {
 		t.Fatal("Secret created at is on future")
 	}
 }
+
+func TestFindSecretByID(t *testing.T) {
+	setupTestSecret(t)
+
+	db := database.GetConnection()
+	user_db, err := user_model.Create(db, "secret_user_test", "somepass")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user_id := *user_db.ID
+	secret_dto := secret_model.SecretDTO{
+		UserID: user_id,
+		Name: "some secret name",
+		Secret: "some secret",
+		Encrypted: false,
+	}
+	secret_db, err := secret_model.Create(db, secret_dto)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	secret_find_db, err := secret_model.FindByID(db, secret_db.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = secret_find_db.Compare(secret_db); err != nil {
+		t.Fatal(err)
+	}
+}

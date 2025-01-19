@@ -2,6 +2,7 @@ package secret
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"secret-manager/backend/services/database"
@@ -39,6 +40,38 @@ func (sd *SecretDB) ToH() gin.H {
 		"created_at": sd.CreatedAt,
 
 	};
+}
+
+func (sd *SecretDB) Compare(other *SecretDB) error {
+	if sd.ID != other.ID {
+		return errors.New(fmt.Sprintf("Wrong ID %d != %d", sd.ID, other.ID))
+	}
+
+	if sd.Name != other.Name {
+		return errors.New(fmt.Sprintf("Wrong name %v != %v", sd.Name, other.Name))
+	}
+
+	if sd.UserID != other.UserID {
+		return errors.New(
+			fmt.Sprintf("Wrong user id %d != %d", sd.UserID, other.UserID))
+	}
+
+	if sd.Secret != other.Secret {
+		return errors.New(
+			fmt.Sprintf("Wrong secret %v != %v", sd.Secret, other.Secret))
+	}
+
+	if sd.Encrypted != other.Encrypted {
+		return errors.New(
+			fmt.Sprintf("Wrong secret %v != %v", sd.Encrypted, other.Encrypted))
+	}
+
+	if sd.CreatedAt.Compare(other.CreatedAt) != 0 {
+		return errors.New(
+			fmt.Sprintf("Wrong secret %v != %v", sd.CreatedAt, other.CreatedAt))
+	}
+
+	return nil
 }
 
 // TODO: Add a secret encryption (sync) support
