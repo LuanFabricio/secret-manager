@@ -90,3 +90,33 @@ func FindSecretByID(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, secret_db.ToH())
 }
+
+func FindSecretsByUserID(c *gin.Context) {
+	token := c.GetHeader("token")
+
+	token_user_id, err := auth.ExtractTokenId(token)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	user_id, err := strconv.Atoi(token_user_id)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	secrets, err := secret.FindByUserID(db, uint(user_id))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, secrets)
+}

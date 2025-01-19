@@ -16,6 +16,7 @@ func BindRoutes(r *gin.Engine) {
 	authorized.Use(auth_middleware.AuthMiddleware())
 	{
 		authorized.GET("/secret/id/:id", secret_controller.FindSecretByID)
+		authorized.GET("/secret/user_id", secret_controller.FindSecretsByUserID)
 		authorized.POST("/secret", secret_controller.CreateSecret)
 
 		authorized.GET("/user/id/:id", user.GetUserById);

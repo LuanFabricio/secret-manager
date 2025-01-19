@@ -74,6 +74,16 @@ func (sd *SecretDB) Compare(other *SecretDB) error {
 	return nil
 }
 
+func (sd *SecretDB) loadFromRow(row database.Row) error {
+	return row.Scan(&sd.ID,
+		&sd.UserID,
+		&sd.Name,
+		&sd.Secret,
+		&sd.Encrypted,
+		&sd.CreatedAt,
+	)
+}
+
 // TODO: Add a secret encryption (sync) support
 func Create(db database.Database, secret SecretDTO) (*SecretDB, error) {
 	var new_secret SecretDB;
@@ -106,7 +116,7 @@ func Create(db database.Database, secret SecretDTO) (*SecretDB, error) {
 func FindByID(db database.Database, secret_id uint) (*SecretDB, error) {
 	var find_secret SecretDB
 
-	err := db.QueryRow(
+	row := db.QueryRow(
 		`SELECT
 			s.id,
 			s.user_id,
@@ -117,17 +127,43 @@ func FindByID(db database.Database, secret_id uint) (*SecretDB, error) {
 		FROM secrets s
 		WHERE s.id = $1`,
 		secret_id,
-	).Scan(&find_secret.ID,
-		&find_secret.UserID,
-		&find_secret.Name,
-		&find_secret.Secret,
-		&find_secret.Encrypted,
-		&find_secret.CreatedAt,
 	)
 
+	err := find_secret.loadFromRow(row)
 	if err != nil {
 		return nil, err
 	}
 
 	return &find_secret, nil
+}
+
+func FindByUserID(db database.Database, user_id uint) ([]SecretDB, error) {
+	row, err := db.Query(
+		`SELECT
+			s.id,
+			s.user_id,
+			s.name,
+			s.secret,
+			s.encrypted,
+			s.created_at
+		FROM secrets s
+		WHERE s.user_id = $1`,
+		user_id,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	secrets := make([]SecretDB, 0)
+	for row.Next() {
+		var secret_db SecretDB
+		err = secret_db.loadFromRow(row)
+		if err != nil {
+			return nil, err
+		}
+
+		secrets = append(secrets, secret_db)
+	}
+
+	return secrets, nil
 }
