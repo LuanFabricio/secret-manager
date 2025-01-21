@@ -167,3 +167,26 @@ func FindByUserID(db database.Database, user_id uint) ([]SecretDB, error) {
 
 	return secrets, nil
 }
+
+func DeleteById(db database.Database, secret_id uint) (*SecretDB, error) {
+	row := db.QueryRow(
+		`DELETE FROM secrets
+		WHERE id = $1
+		RETURNING
+			id,
+			user_id,
+			name,
+			secret,
+			encrypted,
+			created_at
+		`,
+		secret_id,
+	)
+
+	var secret_db SecretDB
+	if err := secret_db.loadFromRow(row); err != nil {
+		return nil, err
+	}
+
+	return &secret_db, nil
+}
