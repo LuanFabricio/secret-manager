@@ -138,3 +138,41 @@ func TestFindSecretByUserID(t *testing.T) {
 		t.Fatalf("The secrets length dont match")
 	}
 }
+
+func TestDeleteByUserID(t *testing.T) {
+	setupTestSecret(t)
+
+	db := database.GetConnection()
+	user_db, err := user_model.Create(db, "secret_user_test", "somepass")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user_id := *user_db.ID
+	secret_dto := secret_model.SecretDTO{
+		UserID: user_id,
+		Name: "some secret name",
+		Secret: "some secret",
+		Encrypted: false,
+	}
+
+	created_secret, err := secret_model.Create(db, secret_dto)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	deleted_secret, err := secret_model.DeleteById(db, created_secret.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if deleted_secret.ID != created_secret.ID {
+		t.Fatalf("Deleted id dont match with created id (%v != %v)",
+			deleted_secret, created_secret.ID)
+	}
+
+	find_secret, err := secret_model.FindByID(db, deleted_secret.ID)
+	if find_secret != nil || err == nil {
+		t.Fatalf("The secret should not be in the database ")
+	}
+}
