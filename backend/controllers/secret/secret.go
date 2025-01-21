@@ -120,3 +120,56 @@ func FindSecretsByUserID(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, secrets)
 }
+
+func DeleteSecretByID(c *gin.Context) {
+	token := c.GetHeader("token")
+
+	token_user_id, err := auth.ExtractTokenId(token)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	user_id, err := strconv.Atoi(token_user_id)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	secret_id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	secret_to_delete, err := secret.FindByID(db, uint(secret_id))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if uint(user_id) != secret_to_delete.UserID {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": "Only the owner can exclude the secret",
+		})
+		return
+	}
+
+	deleted_secret, err := secret.DeleteById(db, uint(secret_id))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, deleted_secret)
+}

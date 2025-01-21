@@ -18,6 +18,7 @@ func BindRoutes(r *gin.Engine) {
 		authorized.GET("/secret/id/:id", secret_controller.FindSecretByID)
 		authorized.GET("/secret/user_id", secret_controller.FindSecretsByUserID)
 		authorized.POST("/secret", secret_controller.CreateSecret)
+		authorized.DELETE("/secret/:id", secret_controller.DeleteSecretByID)
 
 		authorized.GET("/user/id/:id", user.GetUserById);
 		authorized.GET("/user/username/:username", user.GetUserByUsername);
