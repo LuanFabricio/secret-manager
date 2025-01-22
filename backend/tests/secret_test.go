@@ -176,3 +176,45 @@ func TestDeleteByUserID(t *testing.T) {
 		t.Fatalf("The secret should not be in the database ")
 	}
 }
+
+func TestUpdateBySecretID(t *testing.T) {
+	setupTestSecret(t)
+
+	db := database.GetConnection()
+	user_db, err := user_model.Create(db, "secret_user_test", "somepass")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user_id := *user_db.ID
+	secret_dto := secret_model.SecretDTO{
+		UserID: user_id,
+		Name: "some secret name",
+		Secret: "some secret",
+		Encrypted: false,
+	}
+
+	created_secret, err := secret_model.Create(db, secret_dto)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	secret_to_update := secret_model.SecretDB{
+		ID: created_secret.ID,
+		UserID: created_secret.UserID,
+		Name: "new name",
+		Secret: "new secret",
+		Encrypted: false,
+		CreatedAt: created_secret.CreatedAt,
+	}
+	updated_user, err := secret_model.UpdateByID(db, secret_to_update)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = updated_user.Compare(&secret_to_update)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
