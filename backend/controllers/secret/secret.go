@@ -173,3 +173,65 @@ func DeleteSecretByID(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, deleted_secret)
 }
+
+// TODO: Improve design
+func UpdateSecretByID(c* gin.Context) {
+	token := c.GetHeader("token")
+
+	token_user_id, err := auth.ExtractTokenId(token)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	user_id, err := strconv.Atoi(token_user_id)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	var secret_update secret.SecretDB
+	err = c.ShouldBindJSON(&secret_update)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if secret_update.UserID != uint(user_id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": "The secret user id should be the token user id",
+		})
+		return
+	}
+
+	secret_to_update, err := secret.FindByID(db, secret_update.ID)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if secret_to_update.UserID != uint(user_id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": "The secret user id dont match with the token user id",
+		})
+		return
+	}
+
+	updated_secret, err := secret.UpdateByID(db, secret_update)
+	if secret_to_update.UserID != uint(user_id) {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, updated_secret)
+}
