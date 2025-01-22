@@ -86,26 +86,20 @@ func (sd *SecretDB) loadFromRow(row database.Row) error {
 
 // TODO: Add a secret encryption (sync) support
 func Create(db database.Database, secret SecretDTO) (*SecretDB, error) {
-	var new_secret SecretDB;
-
 	if secret.Encrypted /*&& secret.EncryptionKey == ""*/{
 		return nil, errors.New("Secret encryption dont have support, yet")
 		// return nil, errors.New("The encryption key should be passed")
 	}
 
-	err := db.QueryRow(
+	row := db.QueryRow(
 		`INSERT INTO secrets (user_id, name, secret, encrypted)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id, user_id, name, secret, encrypted, created_at`,
 		secret.UserID, secret.Name, secret.Secret, secret.Encrypted,
-	).Scan(&new_secret.ID,
-		&new_secret.UserID,
-		&new_secret.Name,
-		&new_secret.Secret,
-		&new_secret.Encrypted,
-		&new_secret.CreatedAt,
 	)
 
+	var new_secret SecretDB;
+	err := new_secret.loadFromRow(row)
 	if err != nil {
 		return nil, err
 	}
