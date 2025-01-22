@@ -184,3 +184,31 @@ func DeleteById(db database.Database, secret_id uint) (*SecretDB, error) {
 
 	return &secret_db, nil
 }
+
+func UpdateByID(db database.Database, new_secret SecretDB) (*SecretDB, error) {
+	row := db.QueryRow(
+		`UPDATE secrets
+		SET name = $2,
+		    secret = $3
+		WHERE id = $1
+		RETURNING
+			id,
+			user_id,
+			name,
+			secret,
+			encrypted,
+			created_at
+		`,
+		new_secret.ID,
+		new_secret.Name,
+		new_secret.Secret,
+	)
+
+	var updated_secret SecretDB
+	err := updated_secret.loadFromRow(row)
+	if err != nil {
+		return nil, err
+	}
+
+	return &updated_secret, nil
+}
