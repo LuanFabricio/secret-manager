@@ -194,7 +194,7 @@ func UpdateSecretByID(c* gin.Context) {
 		return
 	}
 
-	var secret_update secret.SecretDB
+	var secret_update secret.SecretDTO
 	err = c.ShouldBindJSON(&secret_update)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -210,7 +210,7 @@ func UpdateSecretByID(c* gin.Context) {
 		return
 	}
 
-	secret_to_update, err := secret.FindByID(db, secret_update.ID)
+	secret_to_update, err := secret.FindByID(db, *secret_update.ID)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -225,7 +225,11 @@ func UpdateSecretByID(c* gin.Context) {
 		return
 	}
 
-	updated_secret, err := secret.UpdateByID(db, secret_update)
+	updated_secret, err := secret.UpdateByID(db,
+		*secret_update.ID,
+		secret_update.Name,
+		secret_update.Secret,
+	)
 	if secret_to_update.UserID != uint(user_id) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
