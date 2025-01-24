@@ -185,7 +185,7 @@ func DeleteById(db database.Database, secret_id uint) (*SecretDB, error) {
 	return &secret_db, nil
 }
 
-func UpdateByID(db database.Database, new_secret SecretDB) (*SecretDB, error) {
+func UpdateByID(db database.Database, secret_id uint, name, secret string) (*SecretDB, error) {
 	row := db.QueryRow(
 		`UPDATE secrets
 		SET name = $2,
@@ -199,9 +199,7 @@ func UpdateByID(db database.Database, new_secret SecretDB) (*SecretDB, error) {
 			encrypted,
 			created_at
 		`,
-		new_secret.ID,
-		new_secret.Name,
-		new_secret.Secret,
+		secret_id, name, secret,
 	)
 
 	var updated_secret SecretDB
