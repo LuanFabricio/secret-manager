@@ -207,7 +207,7 @@ func TestUpdateBySecretID(t *testing.T) {
 		Encrypted: false,
 		CreatedAt: created_secret.CreatedAt,
 	}
-	updated_user, err := secret_model.UpdateByID(db, secret_to_update)
+	updated_user, err := secret_model.UpdateByID(db, secret_to_update.ID, secret_to_update.Name, secret_to_update.Secret)
 
 	if err != nil {
 		t.Fatal(err)
