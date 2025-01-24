@@ -16,7 +16,7 @@ type SecretDTO struct {
 	UserID	  uint  `json:"user_id" binding:"required"`
 	Name      string `json:"name" binding:"required"`
 	Secret    string `json:"secret" binding:"required"`
-	Encrypted bool `json:"encrypted" binding:"required"`
+	Encrypted bool `json:"encrypted"`
 	EncryptionKey string `json:"encryption_key"`
 	CreatedAt *time.Time `json:"created_at"`
 }
