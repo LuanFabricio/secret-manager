@@ -174,7 +174,6 @@ func DeleteSecretByID(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, deleted_secret)
 }
 
-// TODO: Improve design
 func UpdateSecretByID(c* gin.Context) {
 	token := c.GetHeader("token")
 
