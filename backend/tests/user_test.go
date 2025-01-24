@@ -7,41 +7,21 @@ import (
 
 	user_model "secret-manager/backend/models/user"
 	"secret-manager/backend/services/database"
-
-	"github.com/joho/godotenv"
 )
 
-func setupTest(t *testing.T) {
-	godotenv.Load("../.env")
-	db := database.GetConnection()
-
+func setupTestUser(t *testing.T) {
 	query_bytes, err :=  os.ReadFile("../sql/01_user/01_create_user_table.sql");
-	create_query := string(query_bytes)
-
-	tx, err := db.Begin()
 	if err != nil {
-		t.Fatalf("[User setup - create] Error: %v\n", err)
+		t.Fatal(err)
 	}
+	destroy_query := "drop table if exists secrets; drop table if exists users;"
 
-	_, err = tx.Exec(create_query)
-	if err != nil {
-		tx.Rollback()
-		t.Fatalf("[User setup - exec] Error: %v\n", err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		t.Fatalf("[User setup - commit] Error: %v\n", err)
-	}
-
-	_, err = db.Query("TRUNCATE TABLE users;")
-	if err != nil {
-		t.Fatalf("[User setup - truncate] Error: %v\n", err)
-	}
+	queries := []string { destroy_query, string(query_bytes)}
+	RunTXQuery(t, queries)
 }
 
-func TestCreate(t *testing.T) {
-	setupTest(t)
+func TestCreateUser(t *testing.T) {
+	setupTestUser(t)
 
 	db := database.GetConnection()
 	test_username := "test_username"
@@ -66,7 +46,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestFindByUserID(t *testing.T) {
-	setupTest(t)
+	setupTestUser(t)
 
 	db := database.GetConnection()
 	new_user, err := user_model.Create(db, "test_username", "somepass")
@@ -101,7 +81,7 @@ func TestFindByUserID(t *testing.T) {
 }
 
 func TestFindByUsername(t *testing.T) {
-	setupTest(t)
+	setupTestUser(t)
 
 	db := database.GetConnection()
 	new_user, err := user_model.Create(db, "test_username", "somepass")

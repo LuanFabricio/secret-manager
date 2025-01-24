@@ -33,7 +33,6 @@ func bootConnection() *sql.DB {
 	PSQL_CONNECTION_ENV := "SM_PSQL_CONNECTION"
 	psql_connection, found := os.LookupEnv(PSQL_CONNECTION_ENV);
 
-	log.Printf("PSQL Connection(connected? %v): %v\n", found, psql_connection)
 	if !found {
 		log.Fatalf("Could not find \"%v\"\n", PSQL_CONNECTION_ENV);
 	}
