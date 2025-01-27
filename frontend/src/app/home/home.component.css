@@ -1,0 +1,47 @@
+#section-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  border-color: black;
+  border-style: solid;
+  border-radius: 25px;
+  text-align: center;
+  background-color: #dddddd;
+}
+
+#form-area {
+  padding: 0rem 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#input-area {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1rem;
+}
+
+#links {
+  display: flex;
+  justify-content: space-around;
+}
+
+input {
+  padding: 1px;
+  border-style: solid;
+  border-radius: 1px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+}
+
+button {
+  padding: 1px;
+  border-radius: 5px;
+}
+a {
+  padding: 0rem 10px 1rem;
+}
